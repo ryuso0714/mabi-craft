@@ -1,0 +1,797 @@
+const AppState = {
+  facility: null,
+  item: null
+};
+
+const DOM = {
+  facilitySelect: document.getElementById("facilitySelect"),
+  itemSelect: document.getElementById("itemSelect"),
+  countInput: document.getElementById("targetCount"),
+  calcBtn: document.getElementById("calcBtn"),
+  craftResult: document.getElementById("craftResult"),
+  rawResult: document.getElementById("rawResult")
+};
+
+let DB = {
+  metal: {
+    "철괴": {
+      output: 3,
+      ingredients: {
+        "철 광석": 10
+      }
+    },
+    "강철괴": {
+      output: 3,
+      ingredients: {
+        "철괴": 3,
+        "석탄": 4
+      }
+    },
+    "합금강괴": {
+      output: 3,
+      ingredients: {
+        "강철괴": 3,
+        "동 광석": 15,
+        "석탄": 8
+      }
+    },
+    "타르": {
+      output: 5,
+      ingredients: {
+        "통나무": 50,
+        "점토": 25
+      }
+    },
+    "특수강괴": {
+      output: 3,
+      ingredients: {
+        "합금강괴": 4,
+        "백동 광석": 20,
+        "석탄": 12
+      }
+    },
+    "은합금괴": {
+      output: 3,
+      ingredients: {
+        "특수강괴": 5,
+        "은 광석": 20,
+        "석탄": 16
+      }
+    },
+    "운철괴": {
+      output: 3,
+      ingredients: {
+        "은합금괴": 5,
+        "운철 광석": 20,
+        "석탄": 20
+      }
+    },
+    "백금강괴": {
+      output: 3,
+      ingredients: {
+        "운철괴": 5,
+        "백금 광석": 20,
+        "석탄": 20
+      }
+    }
+  },
+
+  wood: {
+    "목재": {
+      output: 3,
+      ingredients: {
+        "통나무": 10
+      }
+    },
+    "목재+": {
+      output: 3,
+      ingredients: {
+        "목재": 3,
+        "나무 진액": 4
+      }
+    },
+    "상급 목재": {
+      output: 3,
+      ingredients: {
+        "목재+": 3,
+        "상급 통나무": 15,
+        "나무 진액": 8
+      }
+    },
+    "상급 목재+": {
+      output: 3,
+      ingredients: {
+        "상급 목재": 4,
+        "상급 통나무+": 20,
+        "나무 진액": 12
+      }
+    },
+    "부드러운 목재": {
+      output: 3,
+      ingredients: {
+        "상급 목재+": 15,
+        "부드러운 통나무": 30,
+        "나무 진액": 30
+      }
+    },
+    "단단한 목재": {
+      output: 3,
+      ingredients: {
+        "상급 목재+": 15,
+        "단단한 통나무": 30,
+        "나무 진액": 30
+      }
+    },
+    "최상급 목재": {
+      output: 3,
+      ingredients: {
+        "상급 목재+": 5,
+        "최상급 통나무": 20,
+        "나무 진액": 16
+      }
+    },
+    "최상급 목재+": {
+      output: 3,
+      ingredients: {
+        "최상급 목재": 5,
+        "최상급 통나무+": 20,
+        "나무 진액": 20
+      }
+    },
+    "구름결 막대": {
+      output: 5,
+      ingredients: {
+        "부드러운 목재": 2,
+        "환영 가루": 30,
+        "변화의 핵": 50,
+        "사포": 10
+      }
+    },
+    "특급 목재": {
+      output: 3,
+      ingredients: {
+        "최상급 목재+": 5,
+        "특급 통나무": 20,
+        "나무 진액": 20
+      }
+    }
+  },
+
+  leather: {
+    "가죽": {
+      output: 3,
+      ingredients: {
+        "생가죽": 10
+      }
+    },
+    "가죽+": {
+      output: 3,
+      ingredients: {
+        "가죽": 3,
+        "타닌 가루": 4
+      }
+    },
+    "상급 가죽": {
+      output: 3,
+      ingredients: {
+        "가죽+": 3,
+        "상급 생가죽": 15,
+        "타닌 가루": 8
+      }
+    },
+    "상급 가죽+": {
+      output: 3,
+      ingredients: {
+        "상급 가죽": 4,
+        "상급 생가죽+": 20,
+        "타닌 가루": 12
+      }
+    },
+    "최상급 가죽": {
+      output: 3,
+      ingredients: {
+        "상급 가죽+": 5,
+        "최상급 생가죽": 20,
+        "타닌 가루": 16
+      }
+    },
+    "최상급 가죽+": {
+      output: 3,
+      ingredients: {
+        "최상급 가죽": 5,
+        "최상급 생가죽+": 20,
+        "타닌 가루": 20
+      }
+    },
+    "특급 가죽": {
+      output: 3,
+      ingredients: {
+        "최상급 가죽+": 5,
+        "특급 생가죽": 20,
+        "타닌 가루": 20
+      }
+    }
+  },
+
+  cloth: {
+    "옷감": {
+      output: 3,
+      ingredients: {
+        "양털": 10
+      }
+    },
+    "실크": {
+      output: 2,
+      ingredients: {
+        "거미줄": 10
+      }
+    },
+    "옷감+": {
+      output: 3,
+      ingredients: {
+        "옷감": 3,
+        "양털": 4
+      }
+    },
+    "상급 옷감": {
+      output: 3,
+      ingredients: {
+        "옷감+": 3,
+        "상급 양털": 15,
+        "양털": 8
+      }
+    },
+    "두꺼운 옷감": {
+      output: 3,
+      ingredients: {
+        "두꺼운 양털": 50,
+        "상급 양털": 100,
+        "밀랍": 2
+      }
+    },
+    "상급 실크": {
+      output: 2,
+      ingredients: {
+        "실크": 4,
+        "튼튼 버섯 진액": 8
+      }
+    },
+    "상급 옷감+": {
+      output: 3,
+      ingredients: {
+        "상급 옷감": 4,
+        "상급 양털+": 20,
+        "양털": 12
+      }
+    },
+    "식물 섬유": {
+      output: 10,
+      ingredients: {
+        "긴 줄기": 150
+      }
+    },
+    "밧줄": {
+      output: 3,
+      ingredients: {
+        "식물 섬유": 45,
+        "밀랍": 4
+      }
+    },
+    "최상급 옷감": {
+      output: 3,
+      ingredients: {
+        "상급 옷감+": 5,
+        "최상급 양털": 20,
+        "양털": 16
+      }
+    },
+    "최상급 실크": {
+      output: 2,
+      ingredients: {
+        "상급 실크": 4,
+        "최상급 거미줄": 20,
+        "튼튼 버섯 진액": 16
+      }
+    },
+    "튼튼한 밧줄": {
+      output: 3,
+      ingredients: {
+        "밧줄": 6,
+        "식물 섬유": 90,
+        "밀랍": 8,
+        "타르": 3
+      }
+    },
+    "최상급 옷감+": {
+      output: 3,
+      ingredients: {
+        "최상급 옷감": 5,
+        "최상급 양털+": 20,
+        "양털": 20
+      }
+    },
+    "특급 옷감": {
+      output: 3,
+      ingredients: {
+        "최상급 옷감+": 5,
+        "특급 양털": 20,
+        "양털": 20
+      }
+    },
+    "특급 실크": {
+      output: 2,
+      ingredients: {
+        "최상급 실크": 4,
+        "특급 거미줄": 20,
+        "튼튼 버섯 진액": 20
+      }
+    }
+  },
+
+  alchemy: {
+    "새록 버섯 진액": {
+      output: 5,
+      ingredients: {
+        "새록 버섯 포자": 10,
+        "물이 든 병": 1
+      }
+    },
+    "튼튼 버섯 가루": {
+      output: 5,
+      ingredients: {
+        "튼튼 버섯": 20
+      }
+    },
+    "튼튼 버섯 진액": {
+      output: 5,
+      ingredients: {
+        "튼튼 버섯 포자": 10,
+        "물이 든 병": 1
+      }
+    },
+    "광휘의 결정(유령 반딧불이)": {
+      output: 3,
+      ingredients: {
+        "유령 반딧불이": 3,
+        "마나 허브": 10,
+        "점토": 3
+      }
+    },
+    "새록 버섯 포자": {
+      output: 15,
+      ingredients: {
+        "새록 버섯": 30,
+        "종이": 3
+      }
+    },
+    "튼튼 버섯 포자": {
+      output: 15,
+      ingredients: {
+        "튼튼 버섯": 30,
+        "종이": 3
+      }
+    },
+    "쑥쑥 버섯 포자": {
+      output: 15,
+      ingredients: {
+        "쑥쑥 버섯": 30,
+        "종이": 3
+      }
+    },
+    "쑥쑥 버섯 진액": {
+      output: 5,
+      ingredients: {
+        "쑥쑥 버섯 포자": 10,
+        "물이 든 병": 1
+      }
+    },
+    "불꽃의 결정": {
+      output: 3,
+      ingredients: {
+        "석양나비": 3,
+        "마나 허브": 10,
+        "점토": 3
+      }
+    },
+    "아교": {
+      output: 5,
+      ingredients: {
+        "상급 생가죽": 30,
+        "물이 든 병": 10
+      }
+    },
+    "숨숨꽃 가루": {
+      output: 5,
+      ingredients: {
+        "숨숨꽃": 20
+      }
+    },
+    "깔끔 버섯 포자": {
+      output: 15,
+      ingredients: {
+        "깔끔 버섯": 30,
+        "종이": 3
+      }
+    },
+    "깔끔 버섯 진액": {
+      output: 5,
+      ingredients: {
+        "깔끔 버섯 포자": 10,
+        "물이 든 병": 1
+      }
+    },
+    "얼음의 결정": {
+      output: 3,
+      ingredients: {
+        "흰얼음풍뎅이": 3,
+        "마나 허브": 10,
+        "점토": 3
+      }
+    },
+    "마력기폭제": {
+      output: 10,
+      ingredients: {
+        "마력 깃든 돌": 50,
+        "마나 허브": 50,
+        "반짝이는 이끼": 25
+      }
+    },
+    "봉인된 분노의 파편": {
+      output: 1,
+      ingredients: {
+        "분노의 파편": 10,
+        "종이": 10,
+        "봉인된 결정": 5
+      }
+    },
+    "봉인된 망각의 파편": {
+      output: 1,
+      ingredients: {
+        "망각의 파편": 10,
+        "종이": 10,
+        "봉인된 결정": 5
+      }
+    },
+    "봉인된 야성의 파편": {
+      output: 1,
+      ingredients: {
+        "야성의 파편": 10,
+        "종이": 10,
+        "봉인된 결정": 5
+      }
+    },
+    "생채기꽃 가루": {
+      output: 5,
+      ingredients: {
+        "생채기꽃": 20
+      }
+    },
+    "증폭 버섯 포자": {
+      output: 15,
+      ingredients: {
+        "증폭 버섯": 30,
+        "종이": 3
+      }
+    },
+    "증폭 버섯 진액": {
+      output: 5,
+      ingredients: {
+        "증폭 버섯 포자": 10,
+        "쑥쑥 버섯 진액": 10
+      }
+    },
+    "전기의 결정": {
+      output: 3,
+      ingredients: {
+        "낙엽나방": 3,
+        "마나허브": 10,
+        "점토": 3
+      }
+    },
+    "진정초 가루": {
+      output: 5,
+      ingredients: {
+        "진정초": 20
+      }
+    },
+    "솔솔 버섯 포자": {
+      output: 15,
+      ingredients: {
+        "솔솔 버섯": 30,
+        "종이": 3
+      }
+    },
+    "솔솔 버섯 진액": {
+      output: 5,
+      ingredients: {
+        "솔솔 버섯 포자": 10,
+        "새록 버섯 진액": 10
+      }
+    },
+    "봉인의 결정": {
+      output: 3,
+      ingredients: {
+        "황혼잠자리": 3,
+        "마나 허브": 10,
+        "점토": 3
+      }
+    },
+    "환영 가루": {
+      output: 5,
+      ingredients: {
+        "벼락 맞은 나뭇가지": 20,
+        "나비잠자리": 10
+      }
+    },
+    "끈적 풀 가루": {
+      output: 5,
+      ingredients: {
+        "끈적 풀": 20
+      }
+    },
+    "산뜻 버섯 포자": {
+      output: 15,
+      ingredients: {
+        "산뜻 버섯": 30,
+        "종이": 3
+      }
+    },
+    "산뜻 버섯 진액": {
+      output: 5,
+      ingredients: {
+        "산뜻 버섯 포자": 10,
+        "깔끔 버섯 진액": 10
+      }
+    },
+    "광휘의 결정(달무늬 사슴벌레)": {
+      output: 3,
+      ingredients: {
+        "달무늬 사슴벌레": 3,
+        "마나 허브": 10,
+        "점토": 3
+      }
+    }
+  },
+
+  food: {
+    "마요네즈": {
+      output: 3,
+      ingredients: {
+        "달걀": 10,
+        "식용유": 2
+      }
+    },
+    "밀가루": {
+      output: 3,
+      ingredients: {
+        "밀": 15
+      }
+    },
+    "치즈": {
+      output: 3,
+      ingredients: {
+        "우유": 6,
+        "소금": 1
+      }
+    },
+    "면": {
+      output: 3,
+      ingredients: {
+        "밀가루": 3,
+        "달걀": 5,
+        "물이 든 병": 1
+      }
+    },
+    "생크림": {
+      output: 3,
+      ingredients: {
+        "우유": 12,
+        "달걀": 6,
+        "설탕": 2
+      }
+    },
+    "물에 불린 콩": {
+      output: 5,
+      ingredients: {
+        "콩": 30,
+        "물이 든 병": 3
+      }
+    },
+    "두부": {
+      output: 3,
+      ingredients: {
+        "물에 불린 콩": 3,
+        "물이 든 병": 3,
+        "소금": 2,
+        "옷감": 3
+      }
+    },
+    "두유": {
+      output: 3,
+      ingredients: {
+        "물에 불린 콩": 3,
+        "물이 든 병": 3,
+        "소금": 1,
+        "식용유": 1
+      }
+    },
+    "숙성된 커다란 고기": {
+      output: 1,
+      ingredients: {
+        "커다란 고기": 1,
+        "허브": 6,
+        "마늘": 2,
+        "소금": 2,
+        "후추": 1
+      }
+    },
+    "물에 불린 쌀": {
+      output: 5,
+      ingredients: {
+        "쌀": 30,
+        "물이 든 병": 6
+      }
+    },
+    "밥": {
+      output: 3,
+      ingredients: {
+        "물에 불린 쌀": 8,
+        "물이 든 병": 2
+      }
+    },
+    "말린 찻잎": {
+      output: 3,
+      ingredients: {
+        "찻잎": 30
+      }
+    },
+    "발효된 찻잎": {
+      output: 3,
+      ingredients: {
+        "말린 찻잎": 5,
+        "옷감": 1
+      }
+    },
+    "헤이즐넛 오일": {
+      output: 3,
+      ingredients: {
+        "헤이즐넛": 15,
+        "옷감+": 1
+      }
+    },
+    "오트밀": {
+      output: 3,
+      ingredients: {
+        "귀리": 30
+      }
+    }
+  }
+};
+
+const FACILITY_MAP = {
+  metal: "metal",
+  wood: "wood",
+  leather: "leather",
+  cloth: "cloth",
+  potion: "alchemy",
+  food: "food"
+};
+
+function getItemsByFacility(facilityKey) {
+  const dbKey = FACILITY_MAP[facilityKey];
+  if (!dbKey || !DB[dbKey]) return [];
+  return Object.keys(DB[dbKey]);
+}
+
+function updateItemSelect(facilityKey) {
+  const items = getItemsByFacility(facilityKey);
+
+  DOM.itemSelect.innerHTML = "";
+
+  if (!facilityKey) {
+    DOM.itemSelect.disabled = true;
+    DOM.itemSelect.innerHTML = `<option>시설을 먼저 선택</option>`;
+    return;
+  }
+
+  if (items.length === 0) {
+    DOM.itemSelect.disabled = true;
+    DOM.itemSelect.innerHTML = `<option>아이템 없음</option>`;
+    return;
+  }
+
+  DOM.itemSelect.disabled = false;
+
+  const defaultOption = document.createElement("option");
+  defaultOption.value = "";
+  defaultOption.textContent = "아이템 선택";
+  DOM.itemSelect.appendChild(defaultOption);
+
+  items.forEach(item => {
+    const option = document.createElement("option");
+    option.value = item;
+    option.textContent = item;
+    DOM.itemSelect.appendChild(option);
+  });
+}
+
+function findItem(itemName) {
+  for (const category in DB) {
+    if (DB[category][itemName]) {
+      return DB[category][itemName];
+    }
+  }
+  return null;
+}
+
+function createResult() {
+  return {
+    processCount: {},
+    materials: {}
+  };
+}
+
+function addProcess(result, item, count) {
+  if (!result.processCount[item]) result.processCount[item] = 0;
+  result.processCount[item] += count;
+}
+
+function addMaterial(result, item, count) {
+  if (!result.materials[item]) result.materials[item] = 0;
+  result.materials[item] += count;
+}
+
+function resolveItem(itemName, quantity, result) {
+  const item = findItem(itemName);
+
+  if (!item) {
+    addMaterial(result, itemName, quantity);
+    return;
+  }
+
+  const craftsNeeded = Math.ceil(quantity / item.output);
+
+  addProcess(result, itemName, craftsNeeded);
+
+  for (const [mat, amt] of Object.entries(item.ingredients)) {
+    resolveItem(mat, amt * craftsNeeded, result);
+  }
+}
+
+function calculate() {
+  const facilityKey = DOM.facilitySelect.value;
+  const dbKey = FACILITY_MAP[facilityKey];
+  const item = DOM.itemSelect.value;
+  const count = Number(DOM.countInput.value);
+
+  if (!dbKey || !item || !count) return;
+
+  const result = createResult();
+
+  resolveItem(item, count, result);
+  renderResult(result);
+}
+
+function renderResult(result) {
+  DOM.craftResult.innerHTML = "";
+  DOM.rawResult.innerHTML = "";
+
+  for (const [item, count] of Object.entries(result.processCount)) {
+    DOM.craftResult.innerHTML += `<div class="result-item">${item} : ${count}회</div>`;
+  }
+
+  for (const [item, count] of Object.entries(result.materials)) {
+    DOM.rawResult.innerHTML += `<div class="result-item">${item} : ${count}개</div>`;
+  }
+}
+
+DOM.facilitySelect.addEventListener("change", e => {
+  const facilityKey = e.target.value;
+
+  AppState.facility = facilityKey;
+  AppState.item = null;
+
+  updateItemSelect(facilityKey);
+});
+
+DOM.calcBtn.addEventListener("click", calculate);
