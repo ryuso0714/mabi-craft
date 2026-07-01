@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>마비노기 모바일 가공 계산기</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="header">
+    <h1>마비노기 모바일 가공 계산기</h1>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h2>가공시설 선택</h2>
+      <select id="facilitySelect">
+        <option value="">가공시설 선택</option>
+        <option value="metal">금속 가공</option>
+        <option value="wood">목재 가공</option>
+        <option value="leather">가죽 가공</option>
+        <option value="cloth">옷감 가공</option>
+        <option value="potion">약품 가공</option>
+        <option value="food">식재료 가공</option>
+      </select>
+    </section>
+
+    <section class="card">
+      <h2>아이템 선택</h2>
+      <select id="itemSelect" disabled>
+        <option value="">가공시설을 먼저 선택</option>
+      </select>
+    </section>
+
+    <section class="card">
+      <h2>제작할 개수 입력</h2>
+      <input type="number" id="targetCount" min="1">
+    </section>
+
+    <section class="card">
+      <button id="calcBtn">계산하기</button>
+    </section>
+
+    <section class="card result">
+      <h2>제작 공정</h2>
+      <div id="craftResult"></div>
+
+      <h2>원재료 총합</h2>
+      <div id="rawResult"></div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
